@@ -13,3 +13,5 @@ Running
 -------
 
     java -jar gradle-jetty.war
+
+Open http://localhost:8081/welcome in your browser.
