@@ -1,0 +1,39 @@
+apply plugin: 'jetty'
+apply plugin: 'java'
+apply plugin: 'war'
+
+def springVersion = '3.2.3.RELEASE'
+def jettyVersion = '9.0.4.v20130625'
+
+repositories {
+	mavenCentral()
+}
+
+configurations {
+	executableWar
+}
+
+dependencies {
+	compile "org.springframework:spring-core:$springVersion"
+	compile "org.springframework:spring-web:$springVersion"
+	compile "org.springframework:spring-webmvc:$springVersion"
+	executableWar "org.eclipse.jetty.aggregate:jetty-all:$jettyVersion"
+	executableWar "org.eclipse.jetty:jetty-jsp:$jettyVersion"
+}
+
+sourceSets.all {
+	compileClasspath += configurations.executableWar
+}
+
+war {
+	from {
+		configurations.executableWar.collect {
+			return it.isDirectory() ? it : project.zipTree(it)
+		}
+	}
+	from "$buildDir/classes/main"
+	exclude('**/META-INF/*.SF', '**/META-INF/*.RSA', '**/META-INF/*.DSA')
+	manifest {
+		attributes 'Main-Class': 'at.dinauer.deployer.EmbeddedServer'
+	}
+}
